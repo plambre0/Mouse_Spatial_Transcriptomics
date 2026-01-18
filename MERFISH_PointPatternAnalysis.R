@@ -60,22 +60,33 @@ for (i in 1:(n_clusters - 1)) {
   }
 }
 
-#L statistic clac. H(r) = L(r) - r
-extract_peak_l_deviation <- function(k_result) {
+#L statistic calc. H(r) = L(r) - r
+integrate_l_deviation <- function(k_result) {
   r_vec <- k_result$x
   k_vec <- k_result$y
   
-  #Only process finite and positive dist.
+  # Only process finite and positive dist.
   valid_idx <- is.finite(r_vec) & is.finite(k_vec) & r_vec > 0
-  if (!any(valid_idx)) return(0)
+  if (sum(valid_idx) < 2) return(0) 
   
-  #L(r) = (3K(r) / 4pi)^(1/3)
-  l_vec <- (3 * k_vec[valid_idx] / (4 * pi))^(1/3)
+  r_valid <- r_vec[valid_idx]
+  k_valid <- k_vec[valid_idx]
   
-  #H-function
-  h_vec <- l_vec - r_vec[valid_idx]
+  # L(r) transformation
+  l_vec <- (3 * k_valid / (4 * pi))^(1/3)
   
-  return(max(h_vec, na.rm = TRUE))
+  # H(r) is the deviation from CSR (Complete Spatial Randomness)
+  h_vec <- l_vec - r_valid
+  
+  # Numerical Integration via Trapezoidal Rule
+  # Calculates the area between the H(r) curve and the x-axis
+  n <- length(r_valid)
+  dx <- diff(r_valid)
+  mean_heights <- (h_vec[-1] + h_vec[-n]) / 2
+  
+  total_area <- sum(mean_heights * dx)
+  
+  return(total_area)
 }
 
 #L matrix
@@ -84,7 +95,7 @@ adj_matrix_l <- matrix(0, nrow = n_clusters, ncol = n_clusters,
 
 for (pair_name in names(cross_k_results)) {
   ids <- strsplit(pair_name, "_")[[1]]
-  peak_val <- extract_peak_l_deviation(cross_k_results[[pair_name]])
+  peak_val <- integrate_l_deviation(cross_k_results[[pair_name]])
   
   #Thresholding
   final_weight <- ifelse(peak_val > clustering_threshold, peak_val, 0)
