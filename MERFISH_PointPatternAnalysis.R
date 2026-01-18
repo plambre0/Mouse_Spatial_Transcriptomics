@@ -65,21 +65,21 @@ integrate_l_deviation <- function(k_result) {
   r_vec <- k_result$x
   k_vec <- k_result$y
   
-  # Only process finite and positive dist.
+  #Only process finite and positive dist.
   valid_idx <- is.finite(r_vec) & is.finite(k_vec) & r_vec > 0
   if (sum(valid_idx) < 2) return(0) 
   
   r_valid <- r_vec[valid_idx]
   k_valid <- k_vec[valid_idx]
   
-  # L(r) transformation
+  #L(r) transformation
   l_vec <- (3 * k_valid / (4 * pi))^(1/3)
   
-  # H(r) is the deviation from CSR (Complete Spatial Randomness)
+  #H(r) is the deviation from CSR (Complete Spatial Randomness)
   h_vec <- l_vec - r_valid
   
-  # Numerical Integration via Trapezoidal Rule
-  # Calculates the area between the H(r) curve and the x-axis
+  #Numerical Integration via Trapezoidal Rule
+  #Calculates the area between the H(r) curve and the x-axis
   n <- length(r_valid)
   dx <- diff(r_valid)
   mean_heights <- (h_vec[-1] + h_vec[-n]) / 2
@@ -131,3 +131,4 @@ scatterplot3d::scatterplot3d(
   xlab  = "Y", ylab = "Z", zlab = "X",
   main  = "Neuron Meta-Clusters (Based on Spatial L-Function)"
 )
+
