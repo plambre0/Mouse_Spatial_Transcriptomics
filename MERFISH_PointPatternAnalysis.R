@@ -4,6 +4,7 @@ library(spatstat)
 library(bioimagetools)
 library(igraph)
 
+#This script uses higher_k_clusters_neuron_pca.csv and I used the K=145 clusters but you can change most of the setting to whatever.
 higher_k_clusters_neuron_pca <-
   read.csv("C:/Users/Paolo/Downloads/higher_k_clusters_neuron_pca.csv")
 
@@ -131,4 +132,5 @@ scatterplot3d::scatterplot3d(
   xlab  = "Y", ylab = "Z", zlab = "X",
   main  = "Neuron Meta-Clusters (Based on Spatial L-Function)"
 )
+
 
